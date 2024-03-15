@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Request
+import netaddr.core
+
+from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from netaddr import IPAddress
 
@@ -17,6 +19,9 @@ async def say_hello(name: str):
 
 
 @app.get('/ip')
-async def get_user_ip(request: Request):
-    ip_version = IPAddress(request.client.host).version
-    return {"message": f'Your IPv{ip_version} is {request.client.host}'}
+async def check_ip_version(ip: str):
+    try:
+        ip_version = IPAddress(ip).version
+        return {"message": f'IP {ip} is IPv{ip_version}'}
+    except netaddr.core.AddrFormatError:
+        return {"message": f'{ip} is not a valid IP address.'}
